@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>秦泓健 · 产品设计作品集</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0c;
+            --bg-secondary: #111115;
+            --bg-card: #16161b;
+            --bg-card-hover: #1c1c23;
+            --text-primary: #e8e8ec;
+            --text-secondary: #a0a0a8;
+            --text-tertiary: #6a6a74;
+            --accent: #c8a870;
+            --accent-light: #e0c98a;
+            --accent-glow: rgba(200,168,112,0.25);
+            --border-subtle: rgba(255,255,255,0.06);
+            --border-medium: rgba(255,255,255,0.10);
+            --border-accent: rgba(200,168,112,0.4);
+            --font-display: 'DM Sans','Noto Sans SC',sans-serif;
+            --font-body: 'Noto Sans SC','DM Sans',sans-serif;
+            --font-mono: 'JetBrains Mono',monospace;
+            --section-padding: 90px 0;
+            --container-width: 1280px;
+            --card-gap: 28px;
+            --radius-md: 12px;
+            --radius-lg: 18px;
+            --transition-fast: 0.2s cubic-bezier(0.4,0,0.2,1);
+            --transition-smooth: 0.4s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.65;
+            overflow-x: hidden;
+            background-image: radial-gradient(ellipse at 20% 20%, rgba(200,168,112,0.03) 0%, transparent 60%),
+                            radial-gradient(ellipse at 80% 60%, rgba(200,168,112,0.02) 0%, transparent 60%);
+            background-attachment: fixed;
+        }
+
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--border-medium); border-radius: 10px; }
+
+        .geometric-bg {
+            position: fixed;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.03;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(200,168,112,0.4) 60px, rgba(200,168,112,0.4) 61px),
+                            repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(200,168,112,0.3) 60px, rgba(200,168,112,0.3) 61px);
+            mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 20%, transparent 70%);
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 20px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition-smooth);
+            mix-blend-mode: difference;
+        }
+        .navbar.scrolled {
+            background: rgba(10,10,12,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+            mix-blend-mode: normal;
+        }
+        .nav-logo {
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.25;
+            color: var(--text-primary);
+            transition: var(--transition-fast);
+            z-index: 1001;
+        }
+        .logo-cn { font-weight: 700; font-size: 1.2rem; letter-spacing: 0.15em; }
+        .logo-en { font-weight: 400; font-size: 0.65rem; letter-spacing: 0.12em; color: var(--text-secondary); }
+        .nav-logo:hover .logo-cn, .nav-logo:hover .logo-en { color: var(--accent-light); }
+        .nav-links { display: flex; list-style: none; gap: 36px; align-items: center; }
+        .nav-links a {
+            font-size: 0.9rem;
+            font-weight: 400;
+            letter-spacing: 0.03em;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition-fast);
+            padding: 4px 0;
+            position: relative;
+        }
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--accent);
+            transition: var(--transition-smooth);
+        }
+        .nav-links a:hover { color: var(--text-primary); }
+        .nav-links a:hover::after { width: 100%; }
+        .nav-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 8px; }
+        .nav-toggle span { display: block; width: 24px; height: 1.5px; background: var(--text-primary); transition: var(--transition-fast); border-radius: 1px; }
+        .nav-toggle.active span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+        .nav-toggle.active span:nth-child(2) { opacity: 0; }
+        .nav-toggle.active span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+        .main-container { position: relative; z-index: 1; max-width: var(--container-width); margin: 0 auto; padding: 0 32px; }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            padding-top: 80px;
+        }
+        .hero-content { max-width: 720px; position: relative; z-index: 2; }
+        .hero-tag {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            letter-spacing: 0.12em;
+            color: var(--accent);
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            padding: 6px 14px;
+            border: 1px solid var(--border-accent);
+            background: rgba(200,168,112,0.04);
+        }
+        .hero h1 { font-size: clamp(2.8rem, 6vw, 5rem); font-weight: 700; line-height: 1.08; letter-spacing: -0.02em; margin-bottom: 24px; }
+        .hero h1 .highlight { color: var(--accent); }
+        .hero p { font-size: 1.15rem; color: var(--text-secondary); max-width: 520px; line-height: 1.8; margin-bottom: 40px; }
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--bg-primary);
+            background: var(--accent);
+            padding: 14px 32px;
+            text-decoration: none;
+            border-radius: 2px;
+            transition: var(--transition-smooth);
+        }
+        .hero-cta:hover { background: var(--accent-light); box-shadow: 0 0 40px var(--accent-glow); transform: translateY(-2px); }
+        .hero-cta .arrow { transition: var(--transition-fast); }
+        .hero-cta:hover .arrow { transform: translateX(4px); }
+        
+        .hero-decoration {
+            position: absolute;
+            right: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 350px;
+            height: 350px;
+            pointer-events: auto;
+            z-index: 1;
+        }
+        .hero-decoration canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: block;
+            border-radius: 50%;
+            pointer-events: auto;
+        }
+        .hero-decoration .hex-ring {
+            position: absolute;
+            inset: 0;
+            border: 1px solid var(--border-accent);
+            border-radius: 50%;
+            animation: heroPulse 8s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .hero-decoration .hex-ring:nth-child(2) { inset: 30px; animation-delay: -3s; border-color: rgba(200,168,112,0.2); }
+        .hero-decoration .hex-ring:nth-child(3) { inset: 60px; animation-delay: -6s; border-color: rgba(200,168,112,0.1); border-style: dashed; }
+        @keyframes heroPulse { 0%,100% { transform: scale(1); opacity: 0.5; } 50% { transform: scale(1.06); opacity: 1; } }
+
+        .section-header { margin-bottom: 56px; }
+        .section-header .section-number { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 8px; display: block; }
+        .section-header h2 { font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; letter-spacing: -0.02em; }
+        .section-header .divider { display: block; width: 60px; height: 2px; background: var(--accent); margin-top: 16px; border-radius: 1px; }
+
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--card-gap);
+        }
+        .portfolio-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            border: 1px solid var(--border-subtle);
+        }
+        .portfolio-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--border-medium);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 30px var(--accent-glow);
+        }
+        .card-image-wrapper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 4/3;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+        .card-image-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: var(--transition-slow); display: block; }
+        .portfolio-card:hover .card-image-wrapper img { transform: scale(1.05); }
+        .card-image-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(10,10,12,0.7) 0%, transparent 50%);
+            opacity: 0;
+            transition: var(--transition-smooth);
+            display: flex;
+            align-items: flex-end;
+            padding: 20px;
+        }
+        .portfolio-card:hover .card-image-overlay { opacity: 1; }
+        .card-image-overlay .view-project {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            color: #fff;
+            text-transform: uppercase;
+            padding: 8px 16px;
+            border: 1px solid rgba(255,255,255,0.4);
+            border-radius: 2px;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(6px);
+        }
+        .card-corner {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+            opacity: 0;
+            transition: var(--transition-smooth);
+            border-top: 1px solid var(--accent);
+            border-right: 1px solid var(--accent);
+        }
+        .portfolio-card:hover .card-corner { opacity: 0.7; top: 16px; right: 16px; }
+        .card-info { padding: 20px 22px 24px; }
+        .card-info .project-category { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.1em; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
+        .card-info h3 { font-size: 1.2rem; font-weight: 600; letter-spacing: -0.01em; }
+
+        .about-section { padding: var(--section-padding); border-top: 1px solid var(--border-subtle); }
+        .about-content { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+        .about-text p { color: var(--text-secondary); font-size: 1.05rem; line-height: 1.9; margin-bottom: 20px; }
+        .about-text .highlight-text { color: #FFD966; font-weight: 600; text-shadow: 0 0 4px rgba(255,217,102,0.3); }
+        .about-visual { 
+            position: relative; 
+            aspect-ratio: 1; 
+            background: var(--bg-card); 
+            border-radius: var(--radius-lg); 
+            border: 1px solid var(--border-subtle); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+        }
+        .about-visual img { width: 100%; height: 100%; object-fit: cover; opacity: 0.85; transition: 0.3s; position: relative; z-index: 1; }
+
+        .contact-section { padding: var(--section-padding); text-align: center; border-top: 1px solid var(--border-subtle); }
+        .contact-links { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; margin-top: 20px; }
+        .contact-link { font-size: 1rem; color: var(--text-secondary); text-decoration: none; transition: var(--transition-fast); padding: 10px 20px; border: 1px solid var(--border-medium); border-radius: 2px; }
+        .contact-link:hover { color: var(--accent-light); border-color: var(--border-accent); background: rgba(200,168,112,0.04); }
+        .footer { text-align: center; padding: 40px; color: var(--text-tertiary); font-size: 0.8rem; border-top: 1px solid var(--border-subtle); }
+
+        .detail-container {
+            display: none;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 100px 24px 80px;
+        }
+        .detail-container.active { display: block; }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+            transition: color 0.2s;
+            font-family: var(--font-mono);
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+        .back-link:hover { color: var(--accent-light); }
+        .back-link::before { content: '←'; font-size: 1.2rem; }
+        .detail-container h1 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 700; margin-bottom: 12px; letter-spacing: -0.02em; }
+        .project-meta { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 20px; text-transform: uppercase; }
+        .divider { width: 60px; height: 2px; background: var(--accent); margin: 20px 0 32px; }
+        
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 28px;
+            margin: 40px 0;
+        }
+        /* 两图布局：居中对齐，宽度均匀 */
+        .image-gallery.two-columns {
+            grid-template-columns: repeat(2, 1fr);
+            max-width: 80%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .gallery-item {
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+            transition: transform 0.2s;
+        }
+        .gallery-item img {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            display: block;
+        }
+        .gallery-caption {
+            padding: 12px 16px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-align: center;
+            border-top: 1px solid var(--border-subtle);
+            background: rgba(0,0,0,0.2);
+        }
+        .single-image {
+            margin: 30px 0;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+        }
+        .single-image img { width: 100%; display: block; }
+        .image-caption { font-size: 0.8rem; color: var(--text-secondary); margin-top: 8px; text-align: center; }
+        
+        .description p {
+            text-indent: 2em;
+            margin-bottom: 24px;
+        }
+        .description {
+            color: var(--text-secondary);
+            font-size: 1.02rem;
+            line-height: 1.75;
+        }
+        .highlight { color: var(--accent-light); font-weight: 500; }
+        .detail-footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border-subtle); font-size: 0.8rem; color: var(--text-secondary); }
+
+        .fade-in { opacity: 0; transform: translateY(30px); transition: opacity 0.8s cubic-bezier(0.4,0,0.2,1), transform 0.8s cubic-bezier(0.4,0,0.2,1); }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+        .fade-in-delay-1 { transition-delay: 0.1s; }
+        .fade-in-delay-2 { transition-delay: 0.2s; }
+        .fade-in-delay-3 { transition-delay: 0.3s; }
+
+        @media (max-width: 1100px) {
+            .portfolio-grid { grid-template-columns: repeat(4, 1fr); gap: 18px; }
+            .card-info h3 { font-size: 1rem; }
+            .card-info { padding: 16px 18px 20px; }
+        }
+        @media (max-width: 900px) {
+            .navbar { padding: 16px 24px; }
+            .nav-links {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                flex-direction: column;
+                justify-content: center;
+                gap: 28px;
+                background: rgba(10,10,12,0.96);
+                backdrop-filter: blur(24px);
+                border-left: 1px solid var(--border-subtle);
+                transition: var(--transition-smooth);
+                padding: 60px 30px;
+            }
+            .nav-links.active { right: 0; }
+            .nav-toggle { display: flex; }
+            .hero-decoration { display: none; }
+            .about-content { grid-template-columns: 1fr; gap: 48px; }
+            .portfolio-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .main-container { padding: 0 20px; }
+            .image-gallery.two-columns { max-width: 100%; }
+        }
+        @media (max-width: 580px) {
+            .portfolio-grid { grid-template-columns: 1fr; gap: 20px; }
+            .hero h1 { font-size: 2rem; }
+            .image-gallery { grid-template-columns: 1fr; }
+            .image-gallery.two-columns { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="geometric-bg"></div>
+
+<nav class="navbar" id="navbar">
+    <a href="#" class="nav-logo" id="logoHome">
+        <span class="logo-cn">作 品 集</span>
+        <span class="logo-en">PORTFOLIO</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+        <li><a href="#works" class="nav-main-link" data-target="works">作品</a></li>
+        <li><a href="#about" class="nav-main-link" data-target="about">关于</a></li>
+        <li><a href="#contact" class="nav-main-link" data-target="contact">联系</a></li>
+    </ul>
+    <button class="nav-toggle" id="navToggle" aria-label="菜单"><span></span><span></span><span></span></button>
+</nav>
+
+<div id="main-content">
+    <div class="main-container">
+        <section class="hero" id="hero">
+            <div class="hero-content fade-in">
+                <span class="hero-tag">Design &amp; Creative</span>
+                <h1>你好，我是<br><span class="highlight">秦泓健</span></h1>
+                <p>在校期间涉猎多方向产品设计实践，作品包含应急除雪无人车、餐饮打包容器、婴幼儿模块化家具、创意休闲座椅。以探索功能与造型设计为创作思路，积累实践经验。</p>
+                <a href="#works" class="hero-cta">浏览作品 <span class="arrow">→</span></a>
+            </div>
+            <div class="hero-decoration" id="heroDecoration">
+                <div class="hex-ring"></div>
+                <div class="hex-ring"></div>
+                <div class="hex-ring"></div>
+                <canvas id="heroParticleCanvas"></canvas>
+            </div>
+        </section>
+
+        <section class="portfolio-section" id="works">
+            <div class="section-header fade-in">
+                <span class="section-number">01 /</span>
+                <h2>精选作品</h2>
+                <span class="divider"></span>
+            </div>
+            <div class="portfolio-grid">
+                <div class="portfolio-card fade-in fade-in-delay-1" onclick="showProject(1)">
+                    <div class="card-image-wrapper"><img src="./images/che1.jpg" alt="应急除雪无人车" loading="lazy"><div class="card-image-overlay"><span class="view-project">查看详情</span></div><div class="card-corner"></div></div>
+                    <div class="card-info"><span class="project-category">产品设计 / 智能装备</span><h3>集成式应急道路处理无人车</h3></div>
+                </div>
+                <div class="portfolio-card fade-in fade-in-delay-2" onclick="showProject(2)">
+                    <div class="card-image-wrapper"><img src="./images/wan3.jpg" alt="捞面外卖打包" loading="lazy"><div class="card-image-overlay"><span class="view-project">查看详情</span></div><div class="card-corner"></div></div>
+                    <div class="card-info"><span class="project-category">包装设计 / 餐饮容器</span><h3>捞面外卖打包设计</h3></div>
+                </div>
+                <div class="portfolio-card fade-in fade-in-delay-3" onclick="showProject(3)">
+                    <div class="card-image-wrapper"><img src="./images/jiajv2.jpg" alt="儿童陪伴家具" loading="lazy"><div class="card-image-overlay"><span class="view-project">查看详情</span></div><div class="card-corner"></div></div>
+                    <div class="card-info"><span class="project-category">家具设计 / 公共设施</span><h3>儿童陪伴家具设计</h3></div>
+                </div>
+                <div class="portfolio-card fade-in fade-in-delay-4" onclick="showProject(4)">
+                    <div class="card-image-wrapper"><img src="./images/yi2.jpg" alt="葡萄泡泡椅" loading="lazy"><div class="card-image-overlay"><span class="view-project">查看详情</span></div><div class="card-corner"></div></div>
+                    <div class="card-info"><span class="project-category">家具设计 / 仿生座椅</span><h3>葡萄泡泡椅子设计</h3></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="about-section" id="about">
+            <div class="section-header fade-in"><span class="section-number">02 /</span><h2>关于我</h2><span class="divider"></span></div>
+            <div class="about-content">
+                <div class="about-text fade-in">
+                    <p>嗨，我是<span class="highlight-text">秦泓健</span>，一名产品设计专业2026届毕业生。</p>
+                    <p>我相信好的设计兼顾美感与实用，在学习中尝试了智能装备、日用包装、婴幼儿家具、创意家具等多方面的设计练习，不断摸索造型与功能的平衡。</p>
+                    <p>目前在<span class="highlight-text">郑州</span>，期待交流与实践合作。</p>
+                </div>
+                <div class="about-visual fade-in fade-in-delay-2"><img src="https://picsum.photos/id/20/800/800" alt="照片" loading="lazy"></div>
+            </div>
+        </section>
+
+        <section class="contact-section fade-in" id="contact">
+            <div class="section-header"><span class="section-number">03 /</span><h2>保持联系</h2><span class="divider" style="margin:16px auto 0;"></span></div>
+            <p style="color:var(--text-secondary);margin-bottom:30px;">如果你有项目想要合作，欢迎随时联系我。</p>
+            <div class="contact-links">
+                <a href="mailto:2334509037@qq.com" class="contact-link">邮箱 2334509037@qq.com</a>
+                <a href="tel:15836978061" class="contact-link">手机号 15836978061</a>
+            </div>
+        </section>
+    </div>
+    <footer class="footer"><p>&copy; 2026 秦泓健 · 产品设计作品集</p></footer>
+</div>
+
+<!-- 项目详情 1: 无人车 (3张图片，保持不变) -->
+<div id="detail-1" class="detail-container">
+    <button class="back-link" onclick="goBack()">返回作品集</button>
+    <h1>集成式应急道路处理无人车设计</h1>
+    <div class="project-meta">产品设计 · 无人装备 · 道路应急系统</div>
+    <div class="divider"></div>
+    <div class="single-image"><img src="./images/che2.jpg" alt="无人车整车"><div class="image-caption">▲ 无人车整体效果图 | 适用于社区及校园周边道路</div></div>
+    <div class="description"><p>大型设备的清扫工作无法覆盖到社区和学校周边的小型道路，人工清理又慢又累，存在安全隐患。针对这个现实问题，设计了一款专门处理小型道路的应急除雪无人车。车身宽度<span class="highlight">2684毫米</span>，适合三米左右的小型道路，清理宽度<span class="highlight">1.5米</span>，保障行人和非机动车通行。</p><p>功能上集成破冰、吸雪、抛洒和融雪剂喷洒。破冰采用<span class="highlight">磁致伸缩材料驱动铲刀</span>，震动频率高、耗电少。吸雪口配合风机高效收集，尾部融雪剂罐智能喷洒。依靠激光雷达与摄像头实现自主行驶，后台可协同调度，车头投影灯提醒行人避让。</p></div>
+    <div class="image-gallery">
+        <div class="gallery-item"><img src="./images/che3.jpg" alt="破冰铲"><div class="gallery-caption">磁致伸缩破冰铲&浮雪吸雪口</div></div>
+        <div class="gallery-item"><img src="./images/che4.jpg" alt="吸雪口"><div class="gallery-caption">高效抛雪</div></div>
+        <div class="gallery-item"><img src="./images/che5.jpg" alt="融雪剂喷洒"><div class="gallery-caption">顶部太阳能板</div></div>
+    </div>
+    <div class="description"><p>无人车运行过程中，激光雷达与摄像头融合感知，实时回传作业面积与融雪剂余量，多台车可协同调度。整车设计紧凑低重心，适应狭窄街道，极大提升小型道路冬季应急效率。</p></div>
+    <div class="detail-footer"><p>© 秦泓健 · 无人车设计项目</p></div>
+</div>
+
+<!-- 项目详情 2: 捞面外卖 (调整为2张图片，美观双列布局) -->
+<div id="detail-2" class="detail-container">
+    <button class="back-link" onclick="goBack()">返回作品集</button>
+    <h1>捞面的外卖打包设计</h1>
+    <div class="project-meta">包装设计 · 餐饮容器 · 人机优化</div>
+    <div class="divider"></div>
+    <div class="single-image"><img src="./images/wan4.jpg" alt="外卖包装"><div class="image-caption">▲ 分层式捞面外卖容器 | 原汤保温结构</div></div>
+    <div class="description"><p>作为一个面食爱好者，点外卖时常因配送时间长导致面条坨掉，影响口感。针对这一问题，设计出汤面分离且保温防漏的外卖包装。汤面层与篦子层采用<span class="highlight">螺纹连接</span>，防止颠簸撒漏；上层食用层与篦子层以卡槽连接，向右旋转即可开盖，食用时去除隔板，面条由下方汤底保温，“原汤化原食”。</p></div>
+    <!-- 两图居中，优雅排列 -->
+    <div class="image-gallery two-columns">
+        <div class="gallery-item"><img src="./images/wan2.jpg" alt="结构分解"><div class="gallery-caption">结构分解展示</div></div>
+        <div class="gallery-item"><img src="./images/wan1.jpg" alt="使用场景"><div class="gallery-caption">使用场景展示</div></div>
+    </div>
+    <div class="description"><p>容器材质选用食品级PP与耐热隔层，每层都有对应的分隔设计。外观简洁现代，兼顾外带便携与品牌识别度，有效提升面食外送体验。</p></div>
+    <div class="detail-footer"><p>© 秦泓健 · 外卖包装项目</p></div>
+</div>
+
+<!-- 项目详情 3: 儿童陪伴家具 (保持3张图片) -->
+<div id="detail-3" class="detail-container">
+    <button class="back-link" onclick="goBack()">返回作品集</button>
+    <h1>儿童陪伴家具设计</h1>
+    <div class="project-meta">家具设计 · 模块化 · 公共护理设施</div>
+    <div class="divider"></div>
+    <div class="single-image"><img src="./images/jiajv1.jpg" alt="儿童家具场景"><div class="image-caption">▲ 闭合展示</div></div>
+    <div class="description"><p>针对婴幼儿家长群体在公共场所的看护与护理需求，设计集<span class="highlight">娱乐、陪同、护理</span>为一体的多功能设施。整体采用嵌合工艺可拆解重组，满足个性化需求。护理平台高度符合人体工程学（85-95cm），圆角防撞，支撑柱内置伸缩杆调节高度。</p><p>室内款采用人造皮革+海绵填充+实木骨架，户外款为吹塑一体成型含配重块。配色灵活切换，提升公共空间包容性与使用率。</p></div>
+    <div class="image-gallery">
+        <div class="gallery-item"><img src="./images/jiajv3.jpg" alt="俯视图"><div class="gallery-caption">俯视图展示</div></div>
+        <div class="gallery-item"><img src="./images/jiajv4.jpg" alt="侧视图"><div class="gallery-caption">侧视图展示</div></div>
+        <div class="gallery-item"><img src="./images/jiajv5.jpg" alt="柱体平台"><div class="gallery-caption">柱体平台</div></div>
+    </div>
+    <div class="detail-footer"><p>© 秦泓健 · 儿童陪伴家具设计</p></div>
+</div>
+
+<!-- 项目详情 4: 葡萄泡泡椅子 (调整为2张图片，美观双列) -->
+<div id="detail-4" class="detail-container">
+    <button class="back-link" onclick="goBack()">返回作品集</button>
+    <h1>葡萄泡泡椅子设计</h1>
+    <div class="project-meta">家具设计 · 仿生座椅 · 艺术装饰</div>
+    <div class="divider"></div>
+    <div class="single-image"><img src="./images/yi1.jpg" alt="葡萄泡泡椅"><div class="image-caption">▲ 克莱因蓝主题 / 葡萄簇群仿生形态</div></div>
+    <div class="description"><p>以葡萄果实簇群为仿生原型，将大小错落的球状模块组合构成椅身，还原果实堆叠的饱满肌理。底部双弧形金属弯件支撑，轻盈利落，与软体坐面形成轻重对比，实现视觉悬浮效果。</p><p>坐体采用亲肤软性海绵+哑光面料，配色为<span class="highlight">克莱因蓝主题</span>，适配轻奢或童趣空间。既是休闲座椅，也是独特的空间艺术装置。</p></div>
+    <!-- 两图优雅排列 -->
+    <div class="image-gallery two-columns">
+        <div class="gallery-item"><img src="./images/yi4.jpg" alt="金属支架"><div class="gallery-caption">纤细金属弯管支撑结构</div></div>
+        <div class="gallery-item"><img src="./images/yi3.jpg" alt="球体细节"><div class="gallery-caption">渐变球体 + 耐磨哑光面料</div></div>
+    </div>
+    <div class="detail-footer"><p>© 秦泓健 · 葡萄泡泡椅设计</p></div>
+</div>
+
+<script>
+    // 导航栏滚动效果
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => { navbar.classList.toggle('scrolled', window.scrollY > 60); }, { passive: true });
+
+    const navToggle = document.getElementById('navToggle');
+    const navLinks = document.getElementById('navLinks');
+    navToggle.addEventListener('click', () => {
+        navToggle.classList.toggle('active');
+        navLinks.classList.toggle('active');
+        document.body.style.overflow = navLinks.classList.contains('active') ? 'hidden' : '';
+    });
+
+    document.querySelectorAll('.nav-main-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (document.querySelector('.detail-container.active')) {
+                e.preventDefault();
+                goBack();
+                setTimeout(() => {
+                    const targetId = link.getAttribute('data-target');
+                    if (targetId) document.getElementById(targetId).scrollIntoView({ behavior: 'smooth' });
+                }, 120);
+            }
+            navToggle.classList.remove('active');
+            navLinks.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+    });
+
+    document.getElementById('logoHome').addEventListener('click', (e) => {
+        if (document.querySelector('.detail-container.active')) { e.preventDefault(); goBack(); }
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } });
+    }, { rootMargin: '0px 0px -40px 0px', threshold: 0.1 });
+    function observeFadeElements() {
+        document.querySelectorAll('.fade-in').forEach(el => { el.classList.remove('visible'); observer.unobserve(el); observer.observe(el); });
+    }
+    observeFadeElements();
+
+    window.showProject = function(index) {
+        document.getElementById('main-content').style.display = 'none';
+        document.querySelectorAll('.detail-container').forEach(el => el.classList.remove('active'));
+        const detail = document.getElementById('detail-' + index);
+        if (detail) { detail.classList.add('active'); detail.scrollIntoView({ behavior: 'smooth', block: 'start' }); navbar.classList.add('scrolled'); }
+        document.body.style.overflow = '';
+        if (navLinks.classList.contains('active')) navLinks.classList.remove('active');
+        if (navToggle.classList.contains('active')) navToggle.classList.remove('active');
+    };
+    window.goBack = function() {
+        document.querySelectorAll('.detail-container').forEach(el => el.classList.remove('active'));
+        document.getElementById('main-content').style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        observeFadeElements();
+        if (window.scrollY <= 60) navbar.classList.remove('scrolled');
+    };
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && document.querySelector('.detail-container.active')) goBack(); });
+
+    // 英雄区粒子特效
+    (function() {
+        const canvas = document.getElementById('heroParticleCanvas');
+        if (!canvas) return;
+        let ctx = canvas.getContext('2d');
+        let container = document.getElementById('heroDecoration');
+        let width = 0, height = 0, centerX = 0, centerY = 0;
+        let particles = [];
+        const PARTICLE_COUNT = 180;
+        let mouseX = -1000, mouseY = -1000;
+        let mouseInside = false;
+        let animationId = null;
+
+        function resizeCanvas() {
+            if (!container) return;
+            const rect = container.getBoundingClientRect();
+            width = rect.width;
+            height = rect.height;
+            canvas.width = width;
+            canvas.height = height;
+            centerX = width / 2;
+            centerY = height / 2;
+            initParticles();
+        }
+
+        function initParticles() {
+            if (!width || !height) return;
+            particles = [];
+            const maxRadius = Math.min(width, height) * 0.42;
+            for (let i = 0; i < PARTICLE_COUNT; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = maxRadius * (0.6 + Math.random() * 0.5);
+                const x = centerX + Math.cos(angle) * radius;
+                const y = centerY + Math.sin(angle) * radius;
+                particles.push({
+                    x: x, y: y, origX: x, origY: y,
+                    vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4,
+                    size: 2 + Math.random() * 4, alpha: 0.4 + Math.random() * 0.5
+                });
+            }
+        }
+
+        function updateParticles() {
+            if (!width || !height) return;
+            const influenceRadius = 140, forceStrength = 1.2;
+            for (let p of particles) {
+                let dx = p.x - mouseX, dy = p.y - mouseY;
+                let dist = Math.hypot(dx, dy);
+                if (mouseInside && dist < influenceRadius) {
+                    let angle = Math.atan2(dy, dx);
+                    let force = (1 - dist / influenceRadius) * forceStrength;
+                    p.vx += Math.cos(angle) * force;
+                    p.vy += Math.sin(angle) * force;
+                }
+                p.vx += (p.origX - p.x) * 0.008;
+                p.vy += (p.origY - p.y) * 0.008;
+                p.vx *= 0.97; p.vy *= 0.97;
+                p.vx += (Math.random() - 0.5) * 0.06;
+                p.vy += (Math.random() - 0.5) * 0.06;
+                p.x += p.vx; p.y += p.vy;
+                if (p.x < 0) { p.x = 0; p.vx *= -0.5; }
+                if (p.x > width) { p.x = width; p.vx *= -0.5; }
+                if (p.y < 0) { p.y = 0; p.vy *= -0.5; }
+                if (p.y > height) { p.y = height; p.vy *= -0.5; }
+            }
+        }
+
+        function drawParticles() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, width, height);
+            for (let p of particles) {
+                let size = p.size, alphaVal = p.alpha;
+                if (mouseInside) {
+                    let dx = p.x - mouseX, dy = p.y - mouseY;
+                    let dist = Math.hypot(dx, dy);
+                    if (dist < 100) {
+                        let factor = 1 - dist / 100;
+                        size = p.size + factor * 3;
+                        alphaVal = Math.min(0.95, p.alpha + factor * 0.5);
+                    }
+                }
+                ctx.beginPath();
+                const gradient = ctx.createRadialGradient(p.x - 1, p.y - 1, 1, p.x, p.y, size);
+                gradient.addColorStop(0, `rgba(235, 210, 150, ${alphaVal + 0.2})`);
+                gradient.addColorStop(1, `rgba(200, 168, 112, ${alphaVal * 0.8})`);
+                ctx.fillStyle = gradient;
+                ctx.arc(p.x, p.y, size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = 'rgba(200,168,112,0.5)';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        function animate() {
+            if (!canvas || !canvas.parentElement) return;
+            updateParticles();
+            drawParticles();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function onMouseMove(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            let canvasX = (e.clientX - rect.left) * scaleX;
+            let canvasY = (e.clientY - rect.top) * scaleY;
+            canvasX = Math.min(Math.max(0, canvasX), width);
+            canvasY = Math.min(Math.max(0, canvasY), height);
+            mouseX = canvasX; mouseY = canvasY; mouseInside = true;
+        }
+        function onMouseLeave() { mouseInside = false; mouseX = -1000; mouseY = -1000; }
+        function onTouchMove(e) { e.preventDefault(); const rect = canvas.getBoundingClientRect(); const touch = e.touches[0]; if (touch) { const scaleX = canvas.width / rect.width, scaleY = canvas.height / rect.height; let canvasX = (touch.clientX - rect.left) * scaleX, canvasY = (touch.clientY - rect.top) * scaleY; canvasX = Math.min(Math.max(0, canvasX), width); canvasY = Math.min(Math.max(0, canvasY), height); mouseX = canvasX; mouseY = canvasY; mouseInside = true; } }
+        function onTouchEnd() { mouseInside = false; mouseX = -1000; mouseY = -1000; }
+
+        canvas.addEventListener('mousemove', onMouseMove);
+        canvas.addEventListener('mouseleave', onMouseLeave);
+        canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+        canvas.addEventListener('touchend', onTouchEnd);
+        canvas.addEventListener('touchcancel', onTouchEnd);
+        window.addEventListener('resize', () => { resizeCanvas(); initParticles(); });
+        resizeCanvas();
+        animate();
+    })();
+</script>
+</body>
+</html>
